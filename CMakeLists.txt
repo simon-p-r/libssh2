@@ -33,7 +33,7 @@
 # USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 # OF SUCH DAMAGE.
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.19.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -49,7 +49,7 @@ else()
   set (CMAKE_C_STANDARD 90)
 endif()
 
-option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
+
 
 # Parse version
 
@@ -84,6 +84,13 @@ install(
 
 include(max_warnings)
 include(FeatureSummary)
+
+option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
+if(WIN32)
+  option(BUILD_STATIC_CRT "Build static Windows CRT" ON)
+  add_feature_info(Static_CRT BUILD_STATIC_CRT
+   "Windows static CRT enabled")
+endif()
 
 add_subdirectory(src)
 

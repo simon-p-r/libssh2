@@ -76,26 +76,8 @@ if(CRYPTO_BACKEND STREQUAL "OpenSSL" OR NOT CRYPTO_BACKEND)
       list(APPEND LIBRARIES crypt32)
       list(APPEND PC_LIBS -lcrypt32)
 
-      find_file(DLL_LIBEAY32
-        NAMES libeay32.dll crypto.dll libcrypto-1_1.dll libcrypto-1_1-x64.dll
-        HINTS ${_OPENSSL_ROOT_HINTS} PATHS ${_OPENSSL_ROOT_PATHS}
-        PATH_SUFFIXES bin)
-      if (NOT DLL_LIBEAY32)
-        message(WARNING
-          "Unable to find OpenSSL crypto (aka libeay32) DLL, executables may not run")
-      endif()
-
-      find_file(DLL_SSLEAY32
-        NAMES ssleay32.dll ssl.dll libssl-1_1.dll libssl-1_1-x64.dll
-        HINTS ${_OPENSSL_ROOT_HINTS} PATHS ${_OPENSSL_ROOT_PATHS}
-        PATH_SUFFIXES bin)
-      if (NOT DLL_SSLEAY32)
-        message(WARNING
-          "Unable to find OpenSSL ssl (aka ssleay32) DLL, executables may not run")
-      endif()
-
-      if(DLL_LIBEAY32 AND DLL_SSLEAY32)
-        list(APPEND _RUNTIME_DEPENDENCIES ${DLL_LIBEAY32} ${DLL_SSLEAY32})
+      if(OPENSSL_LIBRARIES)
+        list(APPEND _RUNTIME_DEPENDENCIES ${OPENSSL_LIBRARIES})
       endif()
     endif()
 
@@ -382,6 +364,12 @@ install(TARGETS libssh2
 
 if(BUILD_SHARED_LIBS)
   list(APPEND _RUNTIME_DEPENDENCIES $<TARGET_FILE:libssh2>)
+endif()
+
+if(WIN32)
+  if(BUILD_STATIC_CRT)
+    set_property(TARGET libssh2 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+  endif()
 endif()
 
 set(RUNTIME_DEPENDENCIES ${_RUNTIME_DEPENDENCIES} CACHE INTERNAL
